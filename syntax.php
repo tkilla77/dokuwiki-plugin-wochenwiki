@@ -102,7 +102,7 @@ class syntax_plugin_wochenwiki extends SyntaxPlugin
     }
 
     /** matches ~~SCHULJAHR:2026~~ and ~~SCHULJAHR:2026/27~~ */
-    const SCHOOLYEAR_PATTERN = '~~SCHULJAHR:\s*\d{4}(?:/\d{2,4})?\s*~~';
+    public const SCHOOLYEAR_PATTERN = '~~SCHULJAHR:\s*\d{4}(?:/\d{2,4})?\s*~~';
 
     /**
      * Remember the school year declared anywhere in the given wiki text (null if none)
