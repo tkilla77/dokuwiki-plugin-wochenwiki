@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\Parsing\Handler;
 use dokuwiki\Extension\SyntaxPlugin;
 
 /**
@@ -19,7 +20,7 @@ use dokuwiki\Extension\SyntaxPlugin;
 class syntax_plugin_wochenwiki extends SyntaxPlugin
 {
     /** @var int|null start year of the school year of the page being parsed, see action.php */
-    public static $schoolYear = null;
+    public static $schoolYear;
 
     /** @inheritdoc */
     public function getType()
@@ -48,13 +49,13 @@ class syntax_plugin_wochenwiki extends SyntaxPlugin
     }
 
     /** @inheritdoc */
-    public function handle($match, $state, $pos, Doku_Handler $handler)
+    public function handle($match, $state, $pos, Handler $handler)
     {
         // ~~SCHULJAHR:2026~~ was already read by action.php and renders nothing
-        if (substr($match, 0, 2) === '~~') return false;
+        if (str_starts_with($match, '~~')) return false;
 
         $inner = trim(substr(trim($match), strlen('<woche'), -1));
-        $parts = array_map('trim', explode('|', $inner, 2));
+        $parts = array_map(trim(...), explode('|', $inner, 2));
         $spec = $parts[0];
         $note = $parts[1] ?? '';
 
