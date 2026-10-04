@@ -48,4 +48,12 @@ the page, the week after the newest one: as `<woche N>` on pages with
 
 ## Installation
 
-Copy this folder to `lib/plugins/wochenwiki` in your DokuWiki.
+Search for "wochenwiki" in the DokuWiki Extension Manager, or copy this folder
+to `lib/plugins/wochenwiki`. Compatible with DokuWiki "Librarian" (2025-05-14)
+and "Mort" (2026-07-14).
+
+More: https://www.dokuwiki.org/plugin:wochenwiki
+
+## License
+
+GPL 2 (see [LICENSE](LICENSE)).
