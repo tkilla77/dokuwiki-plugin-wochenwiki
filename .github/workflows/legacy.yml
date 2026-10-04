@@ -1,0 +1,51 @@
+name: Legacy DokuWiki Tests
+# The default DokuWiki workflow only tests current releases on PHP 8.2+.
+# This makes sure the plugin keeps working on older installations.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php-version }} DokuWiki ${{ matrix.dokuwiki-release }}
+    runs-on: ubuntu-latest
+
+    env:
+      COMPOSER: _test/composer.json
+      COMPOSER_VENDOR_DIR: _test/vendor
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dokuwiki-release: release-2025-05-14 # Librarian
+            php-version: '7.4'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, PDO, pdo_sqlite, bz2
+
+      - name: Create DokuWiki Environment
+        id: dokuwiki-env
+        uses: dokuwiki/github-action/.github/actions/dokuenv@main
+        with:
+          branch: ${{ matrix.dokuwiki-release }}
+
+      - name: Install Composer Dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
+      - name: Check Syntax
+        run: find ${{ steps.dokuwiki-env.outputs.dir }} -name '*.php' -not -path '*/vendor/*' -print0 | xargs -0L1 php -l
+
+      - name: Run PHPUnit
+        run: composer exec -- phpunit -c _test/phpunit.xml --verbose --stderr --group plugin_wochenwiki
