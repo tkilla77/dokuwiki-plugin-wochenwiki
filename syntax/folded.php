@@ -1,5 +1,7 @@
 <?php
 
+use dokuwiki\Parsing\Handler;
+
 /**
  * Wochenwiki: <woche> inside ++++ ... ++++ blocks of the folded plugin
  *
@@ -27,9 +29,9 @@ class syntax_plugin_wochenwiki_folded extends syntax_plugin_wochenwiki
     }
 
     /** @inheritdoc */
-    public function handle($match, $state, $pos, Doku_Handler $handler)
+    public function handle($match, $state, $pos, Handler $handler)
     {
-        if (substr($match, 0, 2) === '~~') return false;
+        if (str_starts_with($match, '~~')) return false;
         return $this->parseTag($match);
     }
 
