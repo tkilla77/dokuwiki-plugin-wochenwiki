@@ -46,7 +46,7 @@ class syntax_plugin_wochenwiki extends SyntaxPlugin
     /** @inheritdoc */
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern('[ \t]*<[Ww]oche\b[^>\n]*>[ \t]*(?=\n)', $mode, 'plugin_wochenwiki');
+        $this->Lexer->addSpecialPattern(self::TAG_PATTERN, $mode, 'plugin_wochenwiki');
         $this->Lexer->addSpecialPattern(self::SCHOOLYEAR_PATTERN, $mode, 'plugin_wochenwiki');
     }
 
@@ -56,6 +56,31 @@ class syntax_plugin_wochenwiki extends SyntaxPlugin
         // ~~SCHULJAHR:2026~~ was already read by action.php and renders nothing
         if (substr($match, 0, 2) === '~~') return false;
 
+        $data = $this->parseTag($match);
+        if (isset($data['error'])) return $data;
+
+        // Let the core create the header exactly like a hand-written one:
+        // TOC entry, anchor, section edit button and the surrounding section.
+        $equals = str_repeat('=', 7 - $data['level']);
+        $header = "$equals {$data['title']} $equals";
+        if (class_exists('dokuwiki\\Parsing\\ModeRegistry')) {
+            // newer DokuWiki: header() is a deprecated wrapper around the mode object
+            $handler->handleToken('header', $header, $state, $pos);
+        } else {
+            $handler->header($header, $state, $pos);
+        }
+
+        return false; // no plugin instruction needed
+    }
+
+    /**
+     * Turn a <woche ...> tag into the header title and level
+     *
+     * @param string $match the complete tag
+     * @return array ['title' => ..., 'level' => ...] or ['error' => spec, 'msg' => lang key]
+     */
+    protected function parseTag($match)
+    {
         $inner = trim(substr(trim($match), strlen('<woche'), -1));
         $parts = array_map('trim', explode('|', $inner, 2));
         $spec = $parts[0];
@@ -78,19 +103,7 @@ class syntax_plugin_wochenwiki extends SyntaxPlugin
             $title .= ' – ' . $note;
         }
 
-        // Let the core create the header exactly like a hand-written one:
-        // TOC entry, anchor, section edit button and the surrounding section.
-        $level = max(1, min(5, (int)$this->getConf('level')));
-        $equals = str_repeat('=', 7 - $level);
-        $header = "$equals $title $equals";
-        if (class_exists('dokuwiki\\Parsing\\ModeRegistry')) {
-            // newer DokuWiki: header() is a deprecated wrapper around the mode object
-            $handler->handleToken('header', $header, $state, $pos);
-        } else {
-            $handler->header($header, $state, $pos);
-        }
-
-        return false; // no plugin instruction needed
+        return ['title' => $title, 'level' => max(1, min(5, (int)$this->getConf('level')))];
     }
 
     /** @inheritdoc */
@@ -102,6 +115,9 @@ class syntax_plugin_wochenwiki extends SyntaxPlugin
             . '</div>';
         return true;
     }
+
+    /** matches <woche ...> on a line of its own */
+    public const TAG_PATTERN = '[ \t]*<[Ww]oche\b[^>\n]*>[ \t]*(?=\n)';
 
     /** matches ~~SCHULJAHR:2026~~ and ~~SCHULJAHR:2026/27~~ */
     public const SCHOOLYEAR_PATTERN = '~~SCHULJAHR:\s*\d{4}(?:/\d{2,4})?\s*~~';

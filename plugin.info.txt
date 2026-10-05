@@ -1,7 +1,7 @@
 base   wochenwiki
 author Tom Hofmann
 email  tom@scheidweg.net
-date   2026-10-04
+date   2026-10-05
 name   Wochenwiki Plugin
 desc   Week headers via <woche 40/2026> syntax, current week highlighting and an editor button for new weeks.
 url    https://www.dokuwiki.org/plugin:wochenwiki

@@ -28,6 +28,12 @@ others to the following year. To reuse the page next year, copy it and change
 the directive: every `<woche N>` moves to the new school year. Without the
 directive, `<woche N>` shows an error.
 
+### Inside folded blocks
+
+`<woche>` also works inside `++++ Title | … ++++` blocks of the
+[folded plugin](https://www.dokuwiki.org/plugin:folded). Like folded's own
+headers, these are plain HTML headers without TOC entry or section editing.
+
 ## Current week
 
 On page view, the header of the current ISO week and its section get a

@@ -1,0 +1,1 @@
+https://github.com/dokufreaks/plugin-folded.git lib/plugins/folded

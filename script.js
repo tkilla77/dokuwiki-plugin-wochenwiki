@@ -128,6 +128,11 @@ jQuery(function () {
         var level = this.tagName.substr(1);
         $h.addClass('wochenwiki-current')
             .attr('title', LANG.plugins.wochenwiki.current);
-        $h.next('div.level' + level).addClass('wochenwiki-current');
+        var $section = $h.next('div.level' + level);
+        if (!$section.length) {
+            // headers inside folded blocks have no section div: wrap the week's content
+            $section = $h.nextUntil('h1, h2, h3, h4, h5, h6').wrapAll('<div></div>').parent();
+        }
+        $section.addClass('wochenwiki-current');
     });
 });
